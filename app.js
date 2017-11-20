@@ -16,7 +16,9 @@ var app = express();
 app.set('view engine', 'ejs');
 
 //Set the available port or 3000
-var port = process.env.Port || 3000;
+var server_port = process.env.YOUR_PORT || process.env.PORT || 80;
+var server_host = process.env.YOUR_HOST || '0.0.0.0';
+
 
 //Set the static folder
 app.use(express.static(__dirname + '/static'));
@@ -32,5 +34,6 @@ app.get('/', function(req, res) {
         roms: roms
     });
 });
-
-app.listen(port);
+server.listen(server_port, server_host, function() {
+    console.log('Listening on port %d', server_port);
+});
