@@ -1,0 +1,155 @@
+<!-- views/pages/index.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Chip 8 Emulator</title>
+    <link rel="icon" href="/images/controllerIcon.png">
+    <script src="scripts/Chip8.js" type="text/javascript"></script>
+    <script type="text/javascript">
+
+        function play() {
+            //Gets the rom name
+            var selectBox = document.getElementById("selectBox");
+            var selectedValue = selectBox.options[selectBox.selectedIndex].value;
+            var chip8 = new Chip8;
+            var running = true;
+            // Load ROM
+            request = new XMLHttpRequest();
+            request.open("GET", "roms/" + selectedValue, true);
+            request.responseType = "arraybuffer";
+
+            //Reset emulator
+            chip8.reset();
+
+            request.onload = function () {
+                chip8.loadRom(new Uint8Array(request.response));
+                //chip8.showMemory();
+                //Read an instruction
+                while (running) {
+                    chip8.emulateCycle();
+                    if (chip8.drawFlag) {
+                        draw(chip8.display);
+                    }
+                }
+            };
+            request.send();
+        };
+        function draw() {
+            var canvas = document.getElementById('screen');
+            if (canvas.getContext) {
+                var ctx = canvas.getContext("2d");
+
+                ctx.fillStyle = "rgb(200,0,0)";
+                ctx.fillRect(10, 10, 55, 50);
+
+                ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
+                ctx.fillRect(30, 30, 55, 50);
+            }
+        };
+        function draw(display) {
+            var canvas = document.getElementById('screen');
+            var i, x, y;
+            var width = 640;
+            var height = 320;
+            var cellSize = 10;
+            if (canvas.getContext) {
+                var ctx = canvas.getContext("2d");
+                for (i = 0; i < display.length; i++) {
+                    x = (i % width) * cellSize;
+                    y = Math.floor(i / width) * cellSize;
+                    ctx.fillStyle = ["black", "white"][display[i]];
+                    ctx.fillRect(x, y, cellSize, cellSize);
+                }
+            }
+        }
+        function firstDraw() {
+            var canvas = document.getElementById('screen');
+            var i, x, y;
+            var width = 640;
+            var height = 320;
+            var cellSize = 10;
+            if (canvas.getContext) {
+                var ctx = canvas.getContext("2d");
+                ctx.fillStyle = "white";
+                //Draw CHIP8
+                //C
+                ctx.fillRect(25, 50, 30, 220);
+                ctx.fillRect(55, 50, 80, 30);
+                ctx.fillRect(55, 240, 80, 30);
+                //H
+                ctx.fillRect(150, 50, 30, 220);
+                ctx.fillRect(170, 140, 60, 30);
+                ctx.fillRect(230, 50, 30, 220);
+                //I
+                ctx.fillRect(280, 100, 30, 170);
+                ctx.fillRect(280, 50, 30, 30);
+                //P
+                ctx.fillRect(330, 50, 30, 220);
+                ctx.fillRect(330, 50, 110, 30);
+                ctx.fillRect(330, 140, 110, 30);
+                ctx.fillRect(410, 50, 30, 90);
+                //8
+                ctx.fillRect(460, 50, 30, 220);
+                ctx.fillRect(460, 140, 80, 30);
+                ctx.fillRect(540, 50, 30, 220);
+                ctx.fillRect(460, 50, 110, 30);
+                ctx.fillRect(460, 240, 110, 30);
+            }
+        }
+
+    </script>
+    <style type="text/css">
+        h1 {
+            color: rgb(0, 0, 0);
+        }
+
+        canvas {
+            border: 1px solid black;
+            margin: 3vh;
+            background-color: rgb(0, 0, 0)
+        }
+
+        header {
+            text-align: center;
+        }
+
+        body {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body onload="firstDraw();">
+    <header>
+        <h1>This is a chip 8 Emulator</h1>
+        <img width="40" height: "40" src="/images/background.png" />
+    </header>
+    <main>
+        <div>
+            <p>Select a ROM</p>
+            <div>
+                <select id="selectBox">
+                    <% roms.forEach(function(rom) { %>
+                        <option>
+                            <%= rom.name %>
+                        </option>
+                        <% }); %>
+                </select>
+                <button onclick="play();">Play</button>
+            </div>
+            <div>
+                <canvas id="screen" width="640" height="320"></canvas>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <a href=https://github.com/HenriqueLBorges/chip8.git>GitHub repository</a>
+    </footer>
+
+</body>
+
+</html>
