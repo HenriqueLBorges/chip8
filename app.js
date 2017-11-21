@@ -15,8 +15,8 @@ var app = express();
 //Set the view engine to EJSs
 app.set('view engine', 'ejs');
 
-//Set the available port or 80
-var server_port = process.env.YOUR_PORT || process.env.PORT || 80;
+//Set the available port or 3000
+var server_port = process.env.YOUR_PORT || process.env.PORT || 3000;
 var server_host = process.env.YOUR_HOST || '0.0.0.0';
 
 

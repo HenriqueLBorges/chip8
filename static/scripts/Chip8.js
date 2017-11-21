@@ -8,7 +8,8 @@ var Chip8 = function () {
     this.display = new Array(64 * 32),
     this.delayTimer = 0,
     this.soundTimer = 0,
-    this.drawFlag = 0,
+    this.drawFlag = false,
+    this.clearFlag = false,
     this.stack = new Array(16),
     this.position = 0,
     this.fontset =
@@ -71,14 +72,12 @@ var Chip8 = function () {
     },
     this.showMemory = function () {
       console.log('showMemory()');
-      console.log(this.memory)
+      console.log(this.memory);
     },
     this.showRegisters = function () {
       console.log('showRegisters()');
-      let counter = 0;
-      for (i = 0; i < this.registers.length; i++) {
+      for (i = 0; i < this.registers.length; i++)
         console.log("registers [", i.toString(16), "] = ", this.registers[i].toString(16));
-      }
     },
     this.emulateCycle = function () {
       this.opCode = this.memory[this.pc] << 8 | this.memory[this.pc + 1];
@@ -91,7 +90,8 @@ var Chip8 = function () {
             case 0x0000:
               for (i = 0; I < 2048; i++)
                 this.display[i] = 0x0;
-              this.drawFlag = 1;
+              this.clearFlag = true;
+
               this.pc += 2;
               break;
 
@@ -141,7 +141,7 @@ var Chip8 = function () {
           break;
 
         case 0x6000:
-          console.log(((this.opCode & 0x0F00) >> 8));
+          this.registers[15] = this.registers[(this.opCode & 0x0F00) >> 8] & 0x01;
           this.registers[(this.opCode & 0x0F00) >> 8] = (this.opCode & 0x00FF);
           this.pc += 2;
           break;
@@ -258,8 +258,8 @@ var Chip8 = function () {
               }
             }
           }
-          this.drawFlag = 1;
-          this.pc = this.pc + 2;
+          this.drawFlag = true;
+          this.pc += 2;
           break;
 
         case 0xE000:

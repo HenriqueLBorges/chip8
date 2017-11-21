@@ -11,11 +11,14 @@
     <script type="text/javascript">
 
         function play() {
+            //Clear screen
+            clear();
             //Gets the rom name
             var selectBox = document.getElementById("selectBox");
             var selectedValue = selectBox.options[selectBox.selectedIndex].value;
             var chip8 = new Chip8;
             var running = true;
+            var cont = 0;
             // Load ROM
             request = new XMLHttpRequest();
             request.open("GET", "roms/" + selectedValue, true);
@@ -28,25 +31,27 @@
                 chip8.loadRom(new Uint8Array(request.response));
                 //chip8.showMemory();
                 //Read an instruction
-                while (running) {
+                while (cont < 10000) {
+                    console.log(cont);
                     chip8.emulateCycle();
-                    if (chip8.drawFlag) {
+                    if (chip8.drawFlag){
                         draw(chip8.display);
+                        chip8.drawFlag = false;
                     }
+                    if (chip8.clearFlag){
+                        clear();
+                        chip8.clearFlag = false;
+                    }
+                    cont++;
                 }
             };
             request.send();
         };
-        function draw() {
+        function clear() {
             var canvas = document.getElementById('screen');
             if (canvas.getContext) {
                 var ctx = canvas.getContext("2d");
-
-                ctx.fillStyle = "rgb(200,0,0)";
-                ctx.fillRect(10, 10, 55, 50);
-
-                ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
-                ctx.fillRect(30, 30, 55, 50);
+                ctx.clearRect(0, 0, 640 * 10, 320 * 10);
             }
         };
         function draw(display) {
